@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+{% block title %}
+    Home
+{% endblock %}
+
+{% block content %}
+<form>
+    <div class="row">
+        <div class="col">
+            <input type="text" class="form-control" placeholder="Desired Living Space in sqft">
+        </div>
+        <div class="col">
+            <input type="text" class="form-control" placeholder="Min Price">
+        </div>
+        <div class="col">
+            <input type="text" class="form-control" placeholder="Max Price">
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary mb-2">Search</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
