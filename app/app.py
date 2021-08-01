@@ -1,4 +1,4 @@
-# from typing import List, Dict
+from typing import List, Dict
 from flask import Flask, render_template, Response, request
 import simplejson as json
 from flaskext.mysql import MySQL
@@ -28,16 +28,6 @@ def table():
     return render_template('table.html', houses=result)
 
 
-# @app.route('/search', methods=['POST', 'GET'])
-# def search(zipcode):
-#     cursor = mysql.get_db().cursor()
-#     input_data = (request.form.get('square_feet'), request.form.get('min_price'), request.form.get('max_price'))
-#     sql_query = """SELECT * FROM zillow WHERE zip = zipcode"""
-#     cursor.execute(sql_query, input_data)
-#     result = cursor.fetchall()
-#     return render_template('search.html', houses=result)
-
-
 @app.route('/api/v1/table', methods=['GET'])
 def api_browse() -> str:
     cursor = mysql.get_db().cursor()
@@ -58,25 +48,23 @@ def api_retrieve(zipcode) -> str:
     return resp
 
 
-# @app.route('/api/v1/update/<zipcode>')
-# def api_edit(zipcode) -> str:
-#     cursor = mysql.get_db().cursor()
-#     content = request.json
-#     input_data = (content['living_space_sqft'], content['beds'], content['baths'], content['zip'], content['year'],
-#                   content['list_price'], zipcode)
-#     sql_update_query = """UPDATE zillow t SET t.living_space_sqft = %s, t.beds = %s, t.baths = %s, t.zip =
-#             %s, t.year = %s, t.list_price = %s"""
-#     cursor.execute(sql_update_query, input_data)
-#     mysql.get_db().commit()
-#     resp = Response(status=200, mimetype='application/json')
-#     return resp
-
-
-@app.route('/api/v1/zillow', methods=['PUT'])
-def api_add() -> str:
-
+@app.route('/api/v1/update/<zillow_id>', methods=['PUT', 'GET'])
+def api_edit(zillow_id) -> str:
+    cursor = mysql.get_db().cursor()
     content = request.json
+    input_data = (content['living_space_sqft'], content['beds'], content['baths'], content['zip'], content['year'],
+                  content['list_price'], zillow_id)
+    sql_update_query = """UPDATE zillow t SET t.living_space_sqft = %s, t.beds = %s, t.baths = %s, t.zip =
+            %s, t.year = %s, t.list_price = %s"""
+    cursor.execute(sql_update_query, input_data)
+    mysql.get_db().commit()
+    resp = Response(status=200, mimetype='application/json')
+    return resp
 
+
+@app.route('/api/v1/entry', methods=['POST', 'GET'])
+def api_add() -> str:
+    content = request.json
     cursor = mysql.get_db().cursor()
     input_data = (content['living_space_sqft'], content['beds'], content['baths'], content['zip'],
                   content['year'], content['list_price'])
@@ -85,6 +73,16 @@ def api_add() -> str:
     cursor.execute(sql_insert_query, input_data)
     mysql.get_db().commit()
     resp = Response(status=201, mimetype='application/json')
+    return resp
+
+
+@app.route('/api/v1/zillow/<zipcode>', methods=['DELETE'])
+def api_delete(zipcode) -> str:
+    cursor = mysql.get_db().cursor()
+    sql_delete_query = """DELETE FROM zillow WHERE zip = %s """
+    cursor.execute(sql_delete_query, zipcode)
+    mysql.get_db().commit()
+    resp = Response(status=200, mimetype='application/json')
     return resp
 
 
